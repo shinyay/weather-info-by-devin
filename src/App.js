@@ -19,10 +19,8 @@ function App() {
     const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${latitude}&longitude=${longitude}&start_date=${formatDate(startDate)}&end_date=${formatDate(endDate)}&hourly=temperature_2m,precipitation,cloud_cover`;
 
     try {
-      console.log('Fetching weather data from:', url);
       const response = await fetch(url);
       const data = await response.json();
-      console.log('Weather data received:', data);
 
       if (!data.hourly) {
         throw new Error('Hourly data not found in the API response');
