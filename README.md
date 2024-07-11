@@ -2,6 +2,11 @@
 
 This project is a user-friendly web application designed to display weather information, with a focus on rain cloud data. The application allows users to view weather data from the past five hours using a slider feature.
 
+## Demo
+
+- [Demo video](https://github.com/user-attachments/assets/2f5d87b4-f114-45a8-a76b-4f4fd3b35525)
+
+
 ## Features
 
 - Display current weather information, including temperature, precipitation, and cloud cover.
