@@ -41,13 +41,39 @@ function App() {
     }
   }, []);
 
+  // Function to fetch radar data from RainViewer API
+  const fetchRadarData = useCallback(async () => {
+    const url = 'https://api.rainviewer.com/public/weather-maps.json';
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (!data.radar || !data.radar.past) {
+        throw new Error('Radar data not found in the API response');
+      }
+
+      const radarData = data.radar.past.map(frame => ({
+        time: new Date(frame.time * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        url: `${data.host}${frame.path}/256/0/0/0/1/0_0.png`
+      }));
+
+      return radarData;
+    } catch (error) {
+      console.error('Error fetching radar data:', error);
+      setError('Failed to fetch radar data. Please try again later.');
+      return null;
+    }
+  }, []);
+
   const handleSliderChange = useCallback(async (value) => {
     setLoading(true);
     setError(null);
-    const data = await fetchWeatherData(value);
-    setWeatherData(data);
+    const weatherData = await fetchWeatherData(value);
+    const radarData = await fetchRadarData();
+    setWeatherData({ ...weatherData, radarData });
     setLoading(false);
-  }, [fetchWeatherData, setWeatherData]);
+  }, [fetchWeatherData, fetchRadarData, setWeatherData]);
 
   useEffect(() => {
     handleSliderChange(0); // Fetch initial data for the first hour of July 1, 2024
@@ -105,6 +131,22 @@ function App() {
                 <Icon as={FaCloud} w={8} h={8} mb={2} />
                 <Text fontSize="xl">Cloud Cover: {weatherData.cloudCover} %</Text>
               </Box>
+            </Flex>
+          )}
+          {weatherData && weatherData.radarData && !error && (
+            <Flex mt={6} justify="space-around">
+              {weatherData.radarData
+                .filter((radar) => {
+                  const radarTime = new Date(`2024-07-01T${radar.time}:00Z`).getTime();
+                  const selectedTime = new Date(`2024-07-01T${weatherData.time}:00Z`).getTime();
+                  return Math.abs(radarTime - selectedTime) < 600000; // 10 minutes tolerance
+                })
+                .map((radar, index) => (
+                  <Box key={index} textAlign="center">
+                    <Text fontSize="xl" mb={2}>Radar Time: {radar.time}</Text>
+                    <img src={radar.url} alt={`Radar at ${radar.time}`} width="256" height="256" />
+                  </Box>
+                ))}
             </Flex>
           )}
         </header>
