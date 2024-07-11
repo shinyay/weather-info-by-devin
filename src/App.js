@@ -58,6 +58,7 @@ function App() {
         url: `${data.host}${frame.path}/256/0/0/0/1/0_0.png`
       }));
 
+      console.log('Fetched radar data:', radarData);
       return radarData;
     } catch (error) {
       console.error('Error fetching radar data:', error);
@@ -71,6 +72,8 @@ function App() {
     setError(null);
     const weatherData = await fetchWeatherData(value);
     const radarData = await fetchRadarData();
+    console.log('Fetched weather data:', weatherData);
+    console.log('Fetched radar data:', radarData);
     setWeatherData({ ...weatherData, radarData });
     setLoading(false);
   }, [fetchWeatherData, fetchRadarData, setWeatherData]);
